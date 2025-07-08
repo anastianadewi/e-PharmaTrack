@@ -167,6 +167,7 @@ class StokObatController extends Controller
 
         $query = DetailObat::onlyTrashed()
             ->with(['stokobat.jenisobat', 'deletedBy'])
+            ->whereNotNull('deleted_by')
             ->orderBy('deleted_at', 'desc');
 
         if ($search) {

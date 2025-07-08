@@ -44,7 +44,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="2">Belum ada data jenis obat.</td>
+                    <td colspan="3">Belum ada data jenis obat.</td>
                 </tr>
                 @endforelse
             </tbody>

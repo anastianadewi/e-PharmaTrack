@@ -14,6 +14,14 @@
 .card {
     position: relative;
 }
+.bg-light-danger {
+    background-color: #f8d7da !important;
+}
+
+.bg-light-warning {
+    background-color: #fff3cd !important;
+}
+
 </style>
 
 <div class="container-fluid">
@@ -83,7 +91,17 @@
     <div class="row" id="stokobat-table">
         @foreach ($obatList as $obat)
             <div id="obat-{{ $obat->id_obat }}" class="col-md-3 mb-4">
-                <div class="card shadow-sm">
+                @php
+                    $totalStok = $obat->detail->sum('jumlah');
+                    $cardClass = 'card shadow-sm';
+
+                    if ($totalStok == 0) {
+                        $cardClass .= ' border-danger bg-light-danger';
+                    } elseif ($totalStok <= 9) {
+                        $cardClass .= ' border-warning bg-light-warning';
+                    }
+                @endphp
+                <div class="{{ $cardClass }}">
                     @if ($obat->detail->isEmpty())
                         <form id="form-hapus-obat-{{ $obat->id_obat }}" action="{{ route('stokobat.destroyObat', $obat->id_obat) }}" method="POST" style="position: absolute; top: 6px; right: 8px;">
                             @csrf

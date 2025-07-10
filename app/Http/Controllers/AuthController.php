@@ -16,6 +16,13 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
+        $request->validate([
+            'username' => ['required', 'string', 'regex:/^\S*$/'],
+            'password' => ['required', 'string'],
+        ], [
+            'username.regex' => 'Username tidak boleh mengandung spasi.',
+        ]);
+
         $credentials = $request->only('username', 'password');
 
         $user = User::where('username', $credentials['username'])->first();

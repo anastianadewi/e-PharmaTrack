@@ -29,7 +29,7 @@ class UserController extends Controller
         try {
             $request->validate([
                 'nama' => 'required|string|max:50',
-                'username' => 'required|string|max:50',
+                'username' => 'required|string|max:50|unique:user,username|regex:/^\S*$/u',
                 'password' => 'required|string|min:8|max:8',
                 'role' => 'required|in:nakes,pengelolaBMN,kepala',
             ]);
@@ -65,7 +65,7 @@ class UserController extends Controller
         try {
             $request->validate([
                 'nama' => 'required|string|max:50',
-                'username' => 'required|string|max:50',
+                'username' => 'required|string|max:50|unique:user,username,' . $id_user . ',id_user|regex:/^\S*$/u',
                 'password' => 'nullable|string|max:8',
                 'role' => 'required|string|max:255',
             ]);

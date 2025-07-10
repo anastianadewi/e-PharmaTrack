@@ -94,6 +94,7 @@ class DetailObatKeluarController extends Controller
             DB::raw('SUM(detail_obat.jumlah) as total_stok')
         )
         ->groupBy('obat.id_obat', 'obat.nama', 'jenis_obat.nama')
+        ->orderBy('obat.nama') // <-- urutkan berdasarkan nama obat (abjad)
         ->get();
 
         return response()->json($obatList);

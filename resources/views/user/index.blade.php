@@ -78,7 +78,7 @@
             </div>
             <div class="mb-3">
                 <label for="username" class="form-label">Username</label>
-                <input type="text" name="username" id="username" class="form-control" required>
+                <input type="text" name="username" id="username" class="form-control" required pattern="\S+" oninput="this.value = this.value.replace(/\s/g, '')">
             </div>
             <div class="mb-3">
                 <label for="password" class="form-label">Password (masukkan 8 karakter)</label>
@@ -116,7 +116,7 @@
             </div>
             <div class="mb-3">
                 <label for="edit-username" class="form-label">Username</label>
-                <input type="text" name="username" id="edit-username" class="form-control" required>
+                <input type="text" name="username" id="edit-username" class="form-control" required pattern="\S+" oninput="this.value = this.value.replace(/\s/g, '')">
             </div>
             <div class="mb-3">
                 <label for="edit-password" class="form-label">Password (isi jika ingin diubah)</label>

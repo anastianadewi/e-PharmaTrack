@@ -170,8 +170,9 @@
           id="username"
           name="username"
           placeholder="Masukkan username"
-          required
+          required pattern="\S+"
           autofocus
+          oninput="this.value = this.value.replace(/\s/g, '')"
         />
       </div>
 

@@ -9,11 +9,13 @@ use App\Models\User;
 
 class AuthController extends Controller
 {
+    // Menampilkan form login ke pengguna
     public function showLoginForm()
     {
-        return view('auth.login'); // karena kamu pakai resources/views/login.blade.php
+        return view('auth.login'); // pakai resources/views/login.blade.php
     }
 
+    // Menangani proses login saat form dikirimkan
     public function login(Request $request)
     {
         $request->validate([
@@ -23,6 +25,7 @@ class AuthController extends Controller
             'username.regex' => 'Username tidak boleh mengandung spasi.',
         ]);
 
+        // Ambil hanya username dan password dari request
         $credentials = $request->only('username', 'password');
 
         $user = User::where('username', $credentials['username'])->first();
@@ -35,6 +38,7 @@ class AuthController extends Controller
         return back()->withErrors(['login' => 'Username atau password salah.']);
     }
 
+    // Proses logout pengguna
     public function logout()
     {
         Auth::logout();

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Login - SIMOBAT</title>
+<title>Login - PharmaTrack</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet" />
 <style>
   * {
@@ -191,6 +191,7 @@
     </form>
   </div>
 
+  <!-- Script animasi halaman dan notifikasi -->
   <script>
     window.onload = () => {
         document.body.classList.add('show');

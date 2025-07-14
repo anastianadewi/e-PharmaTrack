@@ -157,7 +157,7 @@ class ObatKeluarController extends Controller
                 ];
             });
 
-        $pdf = Pdf::loadView('export.obatKeluar', [
+        $pdf = Pdf::loadView('export.obatkeluar', [
             'detailObatKeluar' => $detailObatKeluar,
             'obatkeluar' => $obatkeluar,
             'user' => Auth::user(),

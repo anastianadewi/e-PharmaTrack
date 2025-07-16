@@ -159,7 +159,7 @@
         },
         options: {
             plugins: {
-                legend: { display: true }
+                legend: { display: false }
             },
             scales: {
                 y: { beginAtZero: true }

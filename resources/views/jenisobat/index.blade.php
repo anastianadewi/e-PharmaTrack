@@ -59,7 +59,7 @@
         <form id="form-tambah-jenis" action="{{ route('jenisobat.store') }}" method="POST">
             @csrf
             <div class="mb-3">
-                <label for="nama" class="form-label">Nama Jenis Obat</label>
+                <label for="nama" class="form-label">Nama Jenis Obat*</label>
                 <input type="text" name="nama" class="form-control" required>
             </div>
             <div class="d-flex justify-content-end gap-2">

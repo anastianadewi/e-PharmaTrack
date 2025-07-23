@@ -110,25 +110,25 @@
         {{-- FORM 1 - TABEL OBAT KELUAR --}}
         <form id="formObatKeluar">
             @csrf
-            <label for="nama" class="form-label">Nama</label>
+            <label for="nama" class="form-label">Nama*</label>
             <input type="text" name="nama" class="form-control mb-2" placeholder="Nama Pasien" required>
-            <label for="jenis_kelamin" class="form-label">Jenis Kelamin</label>
+            <label for="jenis_kelamin" class="form-label">Jenis Kelamin*</label>
             <select name="jenis_kelamin" class="form-control mb-2" required>
                 <option disabled selected>-- Pilih Jenis Kelamin --</option>
                 <option value="Laki-Laki">Laki-Laki</option>
                 <option value="Perempuan">Perempuan</option>
             </select>
-            <label for="keluhan" class="form-label">Keluhan</label>
+            <label for="keluhan" class="form-label">Keluhan*</label>
             <input type="text" name="keluhan" class="form-control mb-2" placeholder="Keluhan" required>
-            <label for="suhu_tubuh" class="form-label">Suhu Tubuh (°C)</label>
+            <label for="suhu_tubuh" class="form-label">Suhu Tubuh (°C)*</label>
             <input type="number" step="0.1" name="suhu_tubuh" class="form-control mb-2" placeholder="Suhu Tubuh (°C)" required>
-            <label for="denyut_nadi" class="form-label">Denyut Nadi (bpm)</label>
+            <label for="denyut_nadi" class="form-label">Denyut Nadi (bpm)*</label>
             <input type="number" name="denyut_nadi" class="form-control mb-2" placeholder="Denyut Nadi (bpm)" required>
-            <label for="tekanan_darah" class="form-label">Tekanan Darah (mmHg)</label>
+            <label for="tekanan_darah" class="form-label">Tekanan Darah (mmHg)*</label>
             <input type="text" name="tekanan_darah" class="form-control mb-2" placeholder="Tekanan Darah (mmHg)" required>
-            <label for="diagnosa" class="form-label">Diagnosa</label>
+            <label for="diagnosa" class="form-label">Diagnosa*</label>
             <input type="text" name="diagnosa" class="form-control mb-2" placeholder="Diagnosa" required>
-            <label for="keterangan" class="form-label">Keterangan</label>
+            <label for="keterangan" class="form-label">Keterangan*</label>
             <input type="text" name="keterangan" class="form-control mb-3" placeholder="Keterangan">
 
             <div class="d-flex justify-content-end">
@@ -141,9 +141,10 @@
         <form id="formDetailObatKeluar" style="display: none;">
             @csrf
             <div id="obat-container">
-                <div class="obat-row mb-2 d-flex">
+                <div class="obat-row mb-2 d-flex align-items-center">
                     <select id="obat" name="id_obat[]" class="form-select me-2" required></select>
                     <input type="number" name="jumlah[]" class="form-control" placeholder="Jumlah" min="1" required>
+                    <button type="button" class="btn btn-outline-danger btn-sm remove-obat ms-2">✕</button>
                 </div>
             </div>
             <button type="button" id="add-obat" class="btn btn-sm btn-secondary mb-3">+ Tambah Obat</button>
@@ -250,6 +251,13 @@ document.getElementById('add-obat').addEventListener('click', () => {
     container.appendChild(newRow);
 });
 
+// Fungsi hapus baris jika tombol "X" diklik
+    document.getElementById('obat-container').addEventListener('click', function (e) {
+        if (e.target.classList.contains('remove-obat')) {
+            e.target.closest('.obat-row').remove();
+        }
+    });
+
 form2.addEventListener('submit', async (e) => {
     e.preventDefault();
     const formData = new FormData(form2);
@@ -263,7 +271,7 @@ form2.addEventListener('submit', async (e) => {
 
         if (!response.ok) {
             const result = await response.json();
-            throw new Error(result.error || 'Terjadi kesalahan saat menyimpan detail.');
+            throw new Error(result.error || result.message || 'Terjadi kesalahan saat menyimpan detail.');
         }
 
         const result = await response.json();

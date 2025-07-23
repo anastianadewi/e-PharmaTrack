@@ -142,12 +142,42 @@
                                 @method('DELETE')
 
                                 @foreach ($obat->detail->sortBy('expired') as $detail)
-                                    <div>
+                                    @php
+                                        $expiredDate = \Carbon\Carbon::parse($detail->expired);
+                                        $today = today();
+                                        $diffDays = $today->diffInDays($expiredDate, false); // Bisa negatif jika sudah lewat
+
+                                        $isExpired = $expiredDate->isPast();
+                                        $isExpiringSoon = !$isExpired && $diffDays <= 30;
+
+                                        // Warna dan style untuk tanggal & jumlah
+                                        $colorClass = $isExpired ? 'text-danger' : ($isExpiringSoon ? 'text-warning' : 'text-dark');
+                                        $fontWeight = ($isExpired || $isExpiringSoon) ? 'fw-bold' : 'fw-normal';
+
+                                        // Label status
+                                        $statusLabel = $isExpired ? '(Sudah Expired)' : ($isExpiringSoon ? '(Hampir Expired)' : '');
+                                    @endphp
+                                    <div class="mb-1">
                                         @if(in_array(auth()->user()->role, ['nakes']))
                                         <input type="checkbox" name="ids_to_delete[]" value="{{ $detail->id_detailobat }}">
                                         @endif
-                                        {{ \Carbon\Carbon::parse($detail->expired)->format('d/m/Y') }}
-                                        <span class="ms-3">{{ $detail->jumlah }}</span>
+
+                                        {{-- Tanggal expired --}}
+                                        <span class="{{ $colorClass }} {{ $fontWeight }}">
+                                            {{ $expiredDate->format('d/m/Y') }}
+                                        </span>
+
+                                        {{-- Jumlah --}}
+                                        <span class="ms-3 {{ $colorClass }} {{ $fontWeight }}">
+                                            {{ $detail->jumlah }}
+                                        </span>
+
+                                        {{-- Keterangan status --}}
+                                        @if($statusLabel)
+                                        <small class="ms-2 fst-italic {{ $colorClass }}" style="font-size: 0.55rem;">
+                                            {{ $statusLabel }}
+                                        </small>
+                                        @endif
                                     </div>
                                 @endforeach
                             </form>
@@ -192,7 +222,7 @@
         <form id="form-tambah-obat" action="{{ route('stokobat.store') }}" method="POST">
             @csrf
             <div class="mb-3">
-                <label for="id_jenisobat" class="form-label">Jenis</label>
+                <label for="id_jenisobat" class="form-label">Jenis*</label>
                 <select name="id_jenisobat" class="form-select" required>
                     <option disabled selected>-- Pilih Jenis --</option>
                     @foreach ($jenisObatList as $jenis)
@@ -201,11 +231,11 @@
                 </select>
             </div>
             <div class="mb-3">
-                <label for="nama" class="form-label">Nama Obat</label>
+                <label for="nama" class="form-label">Nama Obat*</label>
                 <input type="text" name="nama" class="form-control" required>
             </div>
             <div class="mb-3">
-                <label for="golongan" class="form-label">Golongan Obat</label>
+                <label for="golongan" class="form-label">Golongan Obat*</label>
                 <select name="golongan" class="form-control" required>
                     <option disabled selected>-- Pilih Golongan Obat --</option>
                     <option value="Obat Bebas">Obat Bebas</option>
@@ -218,7 +248,7 @@
                 </select>
             </div>
             <div class="mb-3">
-                <label for="keterangan" class="form-label">Keterangan</label>
+                <label for="keterangan" class="form-label">Keterangan*</label>
                 <textarea name="keterangan" class="form-control" placeholder="Tulis Keterangan..."></textarea>
             </div>
             <div class="d-flex justify-content-end gap-2">
@@ -239,11 +269,11 @@
         <form id="form-tambah-stok" method="POST">
             @csrf
             <div class="mb-3">
-                <label for="jumlah" class="form-label">Jumlah Stok</label>
+                <label for="jumlah" class="form-label">Jumlah Stok*</label>
                 <input type="number" name="jumlah" class="form-control" min="1" required>
             </div>
             <div class="mb-3">
-                <label for="expired" class="form-label">Tanggal Expired</label>
+                <label for="expired" class="form-label">Tanggal Expired*</label>
                 <input type="date" name="expired" class="form-control" required>
             </div>
             <div class="d-flex justify-content-end gap-2">

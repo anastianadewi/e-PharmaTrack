@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\DetailObat;
 use App\Models\DetailObatKeluar;
+use App\Models\ObatKeluar;
 use App\Models\StokObat;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class DetailObatKeluarController extends Controller
 {
@@ -31,6 +33,9 @@ class DetailObatKeluarController extends Controller
                     ->where('jumlah', '>', 0)
                     ->orderBy('expired', 'asc')
                     ->get();
+
+                // Hitung stok total yang tersedia
+                $stokTersedia = $detailObatList->sum('jumlah');
 
                 foreach ($detailObatList as $detail) {
                     if ($sisa <= 0) break;
@@ -64,9 +69,13 @@ class DetailObatKeluarController extends Controller
 
                 if ($sisa > 0) {
                     DB::rollBack();
+                    // Ambil nama obat
+                    $obat = StokObat::find($id_obat);
+                    $nama_obat = $obat ? $obat->nama : 'ID ' . $id_obat;
+
                     return response()->json([
                         'success' => false,
-                        'message' => 'Stok untuk obat ID ' . $id_obat . ' tidak mencukupi. Kurang ' . $sisa . ' item.',
+                        'message' => 'Stok untuk obat ' . $nama_obat . ' tidak mencukupi. Stok Tersedia ' . $stokTersedia,
                     ], 400);
                 }
             }
@@ -104,19 +113,63 @@ class DetailObatKeluarController extends Controller
     {
         $validated = $request->validate([
             'id_obatkeluar' => 'required|exists:obat_keluar,id_obatkeluar',
-            'jumlah' => 'required|array',
-            'jumlah.*' => 'required|integer|min:1',
+            'jumlah' => 'nullable|array',
+            'jumlah.*' => 'nullable|integer|min:1',
             'id_detailobatkeluar' => 'nullable|array',
             'id_detailobatkeluar.*' => 'nullable|exists:detail_obat_keluar,id_detailobatkeluar',
-            'id_obat' => 'required|array',
-            'id_obat.*' => 'required|exists:obat,id_obat',
+            'id_obat' => 'nullable|array',
+            'id_obat.*' => 'nullable|exists:obat,id_obat',
         ]);
 
         DB::beginTransaction();
 
         try {
-            $jumlahList = $validated['jumlah'];
             $idDetailList = $validated['id_detailobatkeluar'] ?? [];
+
+            $obatKeluar = ObatKeluar::with('detailObat')->find($validated['id_obatkeluar']);
+            $detailObatKeluar = $obatKeluar->detailObat;
+
+            $existingDetailIds = $detailObatKeluar->pluck('id_detailobatkeluar')->toArray();
+
+            $requestDetailIds = array_filter($idDetailList);
+
+            $toDeleteIds = array_diff($existingDetailIds, $requestDetailIds);
+
+            if (!empty($toDeleteIds)) {
+                $toDeleteData = DetailObatKeluar::whereIn('id_detailobatkeluar', $toDeleteIds)->get();
+
+                $toDeleteDataIds = $toDeleteData->pluck('id_detailobat')->toArray();
+
+                $stockMap = DetailObat::withTrashed()
+                    ->whereIn('id_detailobat', $toDeleteDataIds)
+                    ->get()
+                    ->keyBy('id_detailobat');
+
+                foreach ($stockMap as $stok) {
+                    if ($stok->trashed()) {
+                        $result = $stok->restore();
+                        $stok->deleted_at = null;
+                        Log::info("Restore status for {$stok->id_detailobat}: " . ($result ? 'OK' : 'FAILED'));
+                    }
+                }
+
+                foreach ($toDeleteData as $deleted) {
+                    $detailObat = $stockMap[$deleted->id_detailobat] ?? null;
+                    if ($detailObat) {
+                        $detailObat->jumlah += $deleted->jumlah;
+                        $detailObat->save();
+                    }
+                }
+
+                DetailObatKeluar::whereIn('id_detailobatkeluar', $toDeleteIds)->delete();
+            }
+
+            if (!$request->jumlah) {
+                DB::commit();
+                return response()->json(['success' => true]); 
+            }
+
+            $jumlahList = $validated['jumlah'];
             $idObatList = $validated['id_obat'];
 
             foreach ($idObatList as $index => $id_obat) {

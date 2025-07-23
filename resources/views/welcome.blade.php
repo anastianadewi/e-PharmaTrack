@@ -88,6 +88,52 @@
       box-shadow: 0 8px 24px rgba(0,0,0,0.2);
     }
 
+    .manual-top-right {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: #1c1d52;
+      color: white;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: 6px;
+      text-decoration: none;
+      z-index: 10;
+      transition: 0.3s ease;
+    }
+
+    .manual-top-right:hover {
+      background-color: #13143a;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+      transform: translateY(-1px);
+    }
+
+    .manual-dropdown {
+      display: none;
+      position: absolute;
+      top: 54px;
+      right: 20px;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      z-index: 11;
+      min-width: 180px;
+    }
+
+    .manual-dropdown a {
+      display: block;
+      padding: 10px 16px;
+      color: #1c1d52;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .manual-dropdown a:hover {
+      background-color: #f0f4ff;
+    }
+
     @media (max-width: 768px) {
       h1 {
         font-size: 34px;
@@ -104,6 +150,12 @@
   </style>
 </head>
 <body>
+  <a href="#" class="manual-top-right" onclick="toggleManualDropdown(event)">📘 Manual Book</a>
+  <div class="manual-dropdown" id="manualDropdown">
+    <a href="{{ asset('manual/manual_nakes.pdf') }}" target="_blank">Manual Book Nakes</a>
+    <a href="{{ asset('manual/manual_bmn.pdf') }}" target="_blank">Manual Book BMN</a>
+    <a href="{{ asset('manual/manual_kepala.pdf') }}" target="_blank">Manual Book Kepala</a>
+  </div>
 
   <img src="{{ asset('images/logo_kemenkumham.jpg') }}" alt="Logo Kemenkumham" class="logo">
   <h1>Selamat Datang di e-PharmaTrack</h1>
@@ -117,6 +169,19 @@
         window.location.href = "{{ route('login') }}";
       }, 500);
     }
+    function toggleManualDropdown(event) {
+      event.preventDefault();
+      const dropdown = document.getElementById('manualDropdown');
+      dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+    }
+
+    document.addEventListener('click', function(event) {
+      const dropdown = document.getElementById('manualDropdown');
+      const button = document.querySelector('.manual-top-right');
+      if (!dropdown.contains(event.target) && !button.contains(event.target)) {
+        dropdown.style.display = 'none';
+      }
+    });
   </script>
 
 </body>

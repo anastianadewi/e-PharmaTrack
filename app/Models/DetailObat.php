@@ -13,7 +13,7 @@ class DetailObat extends Model
 
     protected $primaryKey = 'id_detailobat'; // Primary key
 
-    protected $fillable = ['id_obat', 'jumlah', 'expired'];
+    protected $fillable = ['id_obat', 'jumlah', 'expired', 'deleted_at'];
 
     public $timestamps = true;
 

@@ -34,6 +34,16 @@
 .d-none {
     display: none !important;
 }
+
+.btn-same-height {
+    height: 38px;
+    width: 38px;
+    padding: 0;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 </style>
 
 
@@ -141,13 +151,20 @@
                     <input type="hidden" name="id_obatkeluar" value="{{ $obatKeluar->id_obatkeluar }}">
 
                     @foreach ($detailObat as $index => $detail)
+                    <div class="mb-2 obat-row d-flex align-items-center gap-2">
                         <input type="hidden" name="id_detailobatkeluar[]" value="{{ $detail->id_detailobatkeluar }}">
                         <input type="hidden" name="id_obat[]" value="{{ $detail->detailObat->id_obat }}">
-                        <div class="mb-2">
-                            <label>{{ $detail->detailObat->stokobat->nama }}</label>
-                            <small class="text-muted">({{ $detail->detailObat->stokobat->jenisObat->nama }})</small>
+
+                        <div class="flex-grow-1">
+                            <label class="form-label mb-1">{{ $detail->detailObat->stokobat->nama }}</label>
+                            <small class="text-muted d-block mb-1">({{ $detail->detailObat->stokobat->jenisObat->nama }})</small>
                             <input type="number" class="form-control" name="jumlah[]" value="{{ $detail->jumlah }}" min="1">
                         </div>
+
+                        <button type="button" class="btn btn-outline-danger remove-obat btn-same-height mt-5" title="Hapus baris">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
                     @endforeach
                     @csrf
                     <div id="obat-container"></div> {{-- Biarkan kosong, nanti JS isi --}}
@@ -270,7 +287,7 @@ document.getElementById('add-obat').addEventListener('click', function () {
 
             let html = `
                 <label class="form-label">Obat Baru</label>
-                <div class="d-flex gap-2">
+                <div class="d-flex gap-2 align-items-start obat-row">
                     <select name="id_obat[]" class="form-select" required style="flex: 2;">
                         <option value="">-- Pilih Obat --</option>`;
             obatList.forEach(obat => {
@@ -279,8 +296,11 @@ document.getElementById('add-obat').addEventListener('click', function () {
             html += `</select>
                     <input type="number" name="jumlah[]" class="form-control" placeholder="Jumlah" min="1" required style="flex: 1;">
                     <input type="hidden" name="id_detailobatkeluar[]" value="">
+                    <button type="button" class="btn btn-outline-danger btn-sm remove-obat" title="Hapus baris">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
             </div>`;
-
+            
             div.innerHTML = html;
             container.appendChild(div);
         });
@@ -329,6 +349,14 @@ document.getElementById('formEditObat').addEventListener('submit', function (e) 
             text: 'Terjadi kesalahan saat mengirim data.'
         });
     });
+});
+
+// Event delegation untuk hapus baris
+document.addEventListener('click', function (e) {
+    if (e.target.closest('.remove-obat')) {
+        const row = e.target.closest('.obat-row');
+        if (row) row.remove();
+    }
 });
 </script>
 

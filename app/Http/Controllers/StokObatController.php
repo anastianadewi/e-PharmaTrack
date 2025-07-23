@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Exception;
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\StokObat;
 use App\Models\JenisObat;
@@ -13,6 +14,7 @@ use App\Exports\StokObatExport;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\DetailObatKeluar;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -212,8 +214,11 @@ class StokObatController extends Controller
             })
             ->sum('jumlah');
 
-            // Stok pada tanggal tersebut = stok sekarang + jumlah keluar setelah tanggal itu
-            $obat->stok_pada_tanggal = $stokSaatIni + $jumlahKeluar;
+            if (Carbon::parse($request->tanggal)->isToday()) {
+                $obat->stok_pada_tanggal = $stokSaatIni;
+            } else {
+                $obat->stok_pada_tanggal = $stokSaatIni + $jumlahKeluar;
+            }
         }
 
         $pdf = Pdf::loadView('export.stokobat', [
